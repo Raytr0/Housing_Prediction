@@ -8,6 +8,9 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import os
 import glob
 import kagglehub
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 def load_data():
     df = None
@@ -55,6 +58,45 @@ def build_model():
     return model
 
 
+def visualize_model_performance(model, X_test, y_test, predictions):
+    sns.set(style="whitegrid")
+
+    #Chart 1: Actual vs Predicted
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test, predictions, alpha=0.6, color='b')
+    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+    plt.xlabel('Actual Price')
+    plt.ylabel('Predicted Price')
+    plt.title('Actual vs Predicted Prices')
+    plt.tight_layout()
+    plt.show()
+
+    # Chart 2: Feature Importance
+    feature_names = model.named_steps['preprocessor'].get_feature_names_out()
+
+    # Get importance values from the Random Forest
+    importances = model.named_steps['regressor'].feature_importances_
+
+    # Create a DataFrame for easier plotting
+    feat_df = pd.DataFrame({'Feature': feature_names, 'Importance': importances})
+    feat_df = feat_df.sort_values(by='Importance', ascending=False).head(10)  # Top 10 only
+
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x='Importance', y='Feature', data=feat_df, palette='viridis')
+    plt.title('Top 10 Feature Importances')
+    plt.tight_layout()
+    plt.show()
+
+    #Chart 3: Residuals Distribution
+    residuals = y_test - predictions
+    plt.figure(figsize=(10, 6))
+    sns.histplot(residuals, kde=True, color='purple')
+    plt.axvline(x=0, color='r', linestyle='--')
+    plt.xlabel('Residuals (Error)')
+    plt.title('Distribution of Residuals')
+    plt.tight_layout()
+    plt.show()
+
 if __name__ == "__main__":
     df = load_data()
 
@@ -77,6 +119,7 @@ if __name__ == "__main__":
     print(f"Model Performance:")
     print(f"Mean Absolute Error: ${mae:,.2f}")
     print(f"Accuracy (R² Score): {r2:.2%}")
+    visualize_model_performance(model, X_test, y_test, predictions)
 
     try:
         user_input = {

@@ -54,7 +54,7 @@ def remove_outliers(df, column='price'):
 def enrich_data(df):
     df = df.copy()
 
-    # Ratios (Standard)
+    # Ratios
     is_guestroom = df['guestroom'].apply(lambda x: 1 if x == 'yes' else 0)
     total_rooms = df['bedrooms'] + df['bathrooms'] + is_guestroom
     df['area_per_room'] = df['area'] / total_rooms.replace(0, 1)
@@ -105,15 +105,12 @@ def build_ensemble_model():
     return model
 
 
-# --- NEW DASHBOARD FUNCTION (Visualization Only) ---
 def plot_performance_dashboard(model, X_test, y_test, preds):
     sns.set(style="whitegrid")
 
-    # Create a 2x2 grid of plots
     fig, axes = plt.subplots(2, 2, figsize=(16, 10))
     fig.suptitle('Housing Price Model Diagnostics', fontsize=18, weight='bold')
 
-    # --- Chart 1: Actual vs Predicted (Accuracy) ---
     axes[0, 0].scatter(y_test, preds, alpha=0.5, color='#1f77b4', edgecolor='k', s=50)
     min_val = min(y_test.min(), preds.min())
     max_val = max(y_test.max(), preds.max())
@@ -123,7 +120,6 @@ def plot_performance_dashboard(model, X_test, y_test, preds):
     axes[0, 0].set_ylabel('Predicted Price ($)')
     axes[0, 0].legend()
 
-    # --- Chart 2: Residual Plot (Bias Check) ---
     residuals = y_test - preds
     axes[0, 1].scatter(preds, residuals, alpha=0.5, color='#ff7f0e', edgecolor='k', s=50)
     axes[0, 1].axhline(y=0, color='black', linestyle='--', lw=2)
@@ -131,8 +127,6 @@ def plot_performance_dashboard(model, X_test, y_test, preds):
     axes[0, 1].set_xlabel('Predicted Price ($)')
     axes[0, 1].set_ylabel('Error ($)')
 
-    # --- Chart 3: Feature Importance (Logic Check) ---
-    # We must access the internal models of the VotingRegressor to get importance
     feature_names = model.named_steps['preprocessor'].get_feature_names_out()
 
     # Get importance from XGBoost (estimator 0) and Random Forest (estimator 1)
@@ -149,20 +143,19 @@ def plot_performance_dashboard(model, X_test, y_test, preds):
     axes[1, 0].set_title('Top 10 Factors Influencing Price', fontsize=14)
     axes[1, 0].set_xlabel('Relative Importance')
 
-    # --- Chart 4: Error Distribution (Normality Check) ---
     sns.histplot(residuals, kde=True, ax=axes[1, 1], color='#9467bd', bins=30)
     axes[1, 1].axvline(x=0, color='black', linestyle='--')
     axes[1, 1].set_title('Distribution of Prediction Errors', fontsize=14)
     axes[1, 1].set_xlabel('Error ($)')
 
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust for main title
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
 
 
 if __name__ == "__main__":
     df = load_data()
 
-    # 1. Remove Outliers (Crucial step for higher R2)
+    # 1. Remove Outliers
     df_clean = remove_outliers(df, 'price')
 
     # 2. Enrich
@@ -170,7 +163,7 @@ if __name__ == "__main__":
 
     # 3. Prepare Split
     X = df_enriched.drop('price', axis=1)
-    y = np.log1p(df_enriched['price'])  # Log transform is still best practice
+    y = np.log1p(df_enriched['price'])
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 

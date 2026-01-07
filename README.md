@@ -12,12 +12,12 @@ By analyzing housing market data, this project aims to determine which ensemble 
 ## Repository Structure
 
 Housing_Prediction/
-├── RandomForest.py              # Implementation of the Random Forest model
-├── XGBoost.py                   # Implementation of the XGBoost model
-├── XGBoostwithRandomForest.py   # Hybrid/Comparative script running both models
-├── ai_project_report.pdf        # Full project report (Methodology & Results)
-├── ieee-conference-template.pdf # Template used for the report
-└── README.md                    # Project documentation
+├── RandomForest.py              # Implementation of the Random Forest model  
+├── XGBoost.py                   # Implementation of the XGBoost model  
+├── XGBoostwithRandomForest.py   # Hybrid/Comparative script running both models  
+├── ai_project_report.pdf        # Full project report (Methodology & Results)  
+├── ieee-conference-template.pdf # Template used for the report  
+└── README.md                    # Project documentation  
 
 ## Prerequisites & Installation
 
@@ -75,3 +75,4 @@ For a detailed breakdown of the model performance, including **Mean Squared Erro
 
 ## License
 This project is open-source and available under the [MIT License](https://opensource.org/licenses/MIT).
+
